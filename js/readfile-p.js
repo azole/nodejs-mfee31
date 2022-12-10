@@ -3,7 +3,7 @@ const fs = require('fs');
 // Promise 是一個表示非同步運算的最終完成或失敗的物件。
 let p = new Promise((resolve, reject) => {
   // error-first callback
-  fs.readFile('test123.txt', 'utf-8', (err, data) => {
+  fs.readFile('test.txt', 'utf-8', (err, data) => {
     if (err) {
       // 如果 err 有值，表示有錯誤發生
       // 這裡應該要處理錯誤
