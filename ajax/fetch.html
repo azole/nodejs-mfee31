@@ -1,0 +1,42 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>fetch</title>
+  </head>
+  <body>
+    <button id="asyncBtn">非同步</button>
+    <button id="countBtn">測試按鈕</button>
+    <div id="count">0</div>
+    <div id="response">message</div>
+
+    <script>
+      let date = new Date();
+
+      var responseDom = document.getElementById('response');
+
+      var asyncBtn = document.getElementById('asyncBtn');
+      asyncBtn.addEventListener('click', function () {
+        responseDom.innerText = '開始 fetch「非」同步請求';
+        // http://54.71.133.152:3000/
+        fetch('http://54.71.133.152:3000/')
+          .then((response) => {
+            console.log(response);
+            return response.text();
+          })
+          .then((data) => {
+            console.log(data);
+            responseDom.innerText = `來自 fetch 的結果: ${data}`;
+          })
+          .catch((e) => {
+            console.error(e);
+          });
+      });
+
+      var count = document.getElementById('count');
+      var countBtn = document.getElementById('countBtn');
+      countBtn.addEventListener('click', function () {
+        count.innerText = parseInt(count.innerText, 10) + 1;
+      });
+    </script>
+  </body>
+</html>

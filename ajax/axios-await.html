@@ -1,0 +1,32 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>axios</title>
+  </head>
+  <body>
+    <button id="asyncBtn">非同步</button>
+    <button id="countBtn">測試按鈕</button>
+    <div id="count">0</div>
+    <div id="response">message</div>
+    <script src="https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js"></script>
+    <script>
+      let date = new Date();
+
+      var responseDom = document.getElementById('response');
+
+      var asyncBtn = document.getElementById('asyncBtn');
+      asyncBtn.addEventListener('click', async function () {
+        responseDom.innerText = '開始 axios';
+        // http://54.71.133.152:3000/
+        let response = await axios.get('http://54.71.133.152:3000/');
+        responseDom.innerText = `來自 await axios 的結果 ${response.data}`;
+      });
+
+      var count = document.getElementById('count');
+      var countBtn = document.getElementById('countBtn');
+      countBtn.addEventListener('click', function () {
+        count.innerText = parseInt(count.innerText, 10) + 1;
+      });
+    </script>
+  </body>
+</html>

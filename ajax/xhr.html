@@ -1,0 +1,61 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>XHR</title>
+  </head>
+  <body>
+    <button id="syncBtn">同步</button>
+    <button id="asyncBtn">非同步</button>
+    <button id="countBtn">測試按鈕</button>
+    <div id="count">0</div>
+    <div id="response">message</div>
+
+    <script>
+      let date = new Date();
+
+      var responseDom = document.getElementById('response');
+
+      var syncBtn = document.getElementById('syncBtn');
+      syncBtn.addEventListener('click', function () {
+        responseDom.innerText = '開始同步請求';
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          if (this.status === 200) {
+            responseDom.innerText = `同步請求回復 ${this.responseText}`;
+          }
+        };
+        xhr.onerror = function (event) {
+          responseDom.innerText = 'XHR 同步請求發生錯誤';
+        };
+        // method, URL, async (default: true)
+        xhr.open('GET', 'http://54.71.133.152:3000/', false);
+        xhr.send();
+      });
+
+      var asyncBtn = document.getElementById('asyncBtn');
+      asyncBtn.addEventListener('click', function () {
+        responseDom.innerText = '開始「非」同步請求';
+
+        var xhr = new XMLHttpRequest();
+        xhr.onload = function () {
+          if (this.status === 200) {
+            responseDom.innerText = `非同步請求回復 ${this.responseText}`;
+          }
+        };
+        xhr.onerror = function (event) {
+          responseDom.innerText = 'XHR 非同步請求發生錯誤';
+        };
+        // method, URL, async (default: true)
+        xhr.open('GET', 'http://54.71.133.152:3000/', true);
+        xhr.send();
+      });
+
+      var count = document.getElementById('count');
+      var countBtn = document.getElementById('countBtn');
+      countBtn.addEventListener('click', function () {
+        count.innerText = parseInt(count.innerText, 10) + 1;
+      });
+    </script>
+  </body>
+</html>

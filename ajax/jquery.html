@@ -1,0 +1,39 @@
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>jQuery/Ajax</title>
+  </head>
+  <body>
+    <button id="asyncBtn">非同步</button>
+    <button id="countBtn">測試按鈕</button>
+    <div id="count">0</div>
+    <div id="response">message</div>
+    <script
+      src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      let date = new Date();
+
+      var responseDom = document.getElementById('response');
+
+      var asyncBtn = document.getElementById('asyncBtn');
+      asyncBtn.addEventListener('click', function () {
+        responseDom.innerText = '開始 jquery「非」同步請求';
+        $.ajax('http://54.71.133.152:3000/', { method: 'GET' })
+          .done((data) => {
+            console.log(data);
+            responseDom.innerText = `jquery 的結果 ${data}`;
+          })
+          .fail();
+      });
+
+      var count = document.getElementById('count');
+      var countBtn = document.getElementById('countBtn');
+      countBtn.addEventListener('click', function () {
+        count.innerText = parseInt(count.innerText, 10) + 1;
+      });
+    </script>
+  </body>
+</html>
