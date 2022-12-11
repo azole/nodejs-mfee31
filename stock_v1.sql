@@ -20,7 +20,7 @@ DROP TABLE IF EXISTS `members`;
 CREATE TABLE `members` (
   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(256) NOT NULL,
-  `password` varchar(60) DEFAULT NULL,
+  `password` varchar(97) DEFAULT NULL,
   `name` varchar(32) NOT NULL,
   `photo` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`),
