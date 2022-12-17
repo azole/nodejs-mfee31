@@ -30,6 +30,10 @@ CREATE TABLE `stocks` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+INSERT INTO `stocks` (`id`, `name`) VALUES
+('2330',	'台積電'),
+('2412',	'中華電'),
+('2618',	'長榮航');
 
 DROP TABLE IF EXISTS `stock_prices`;
 CREATE TABLE `stock_prices` (
@@ -151,4 +155,4 @@ INSERT INTO `stock_prices` (`stock_id`, `date`, `open_price`, `high_price`, `low
 ('2618',	'2022-12-15',	28.20,	29.00,	28.05,	28.75,	0.55,	21734,	68432062,	1961456084.00),
 ('2618',	'2022-12-16',	28.50,	28.95,	28.35,	28.60,	-0.15,	17852,	56881726,	1633883895.00);
 
--- 2022-12-17 06:39:27
+-- 2022-12-17 07:22:42
