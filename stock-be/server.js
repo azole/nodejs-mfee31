@@ -67,6 +67,21 @@ app.get('/api/stocks', async (req, res, next) => {
   res.json(data);
 });
 
+// localhost:3001/api/stocks/2330
+// req.params.stockId => 2330
+// SELECT * FROM stock_prices WHERE stock_id=2330
+
+// sql injection
+// localhost:3001/api/stocks/1234 or 1=1;--
+// req.params.stockId => 1234 or 1=1;--
+// SELECT * FROM stock_prices WHERE stock_id=1234 or 1=1;--
+app.get('/api/stocks/:stockId', async (req, res, next) => {
+  console.log('/api/stocks/:stockId => ', req.params.stockId);
+  // 會用 prepared statement 的方式來避免發生 sql injection
+  let [data] = await pool.query('SELECT * FROM stock_prices WHERE stock_id=?', [req.params.stockId]);
+  res.json(data);
+});
+
 app.use((req, res, next) => {
   console.log('這裡是的一個中間件 C');
   next();
