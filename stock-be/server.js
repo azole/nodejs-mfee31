@@ -4,6 +4,13 @@ const app = express();
 
 // middleware => pipeline pattern
 
+// 設定 express 處理靜態檔案
+// -> express 內建 -> 不需要安裝任何東西
+// localhost:3001/
+// app.use(express.static('./static'));
+// localhost:3001/2048/
+app.use('/2048', express.static('./static'));
+
 // 中間件
 app.use((req, res, next) => {
   console.log('這裡是的一個中間件 A');
