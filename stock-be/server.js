@@ -1,4 +1,3 @@
-const { application } = require('express');
 const express = require('express');
 // 利用 express 這個框架建立一個 web app
 const app = express();
@@ -15,6 +14,12 @@ let pool = mysql2.createPool({
   // 限制 pool 連線數的上限
   connectionLimit: 10,
 });
+
+// 允許跨源存取
+// 預設是全部開放
+// 也可以做部分限制，參考 npm cors 的文件
+const cors = require('cors');
+app.use(cors());
 
 // middleware => pipeline pattern
 
@@ -57,7 +62,7 @@ app.get('/api', (req, res, next) => {
 app.get('/api/stocks', async (req, res, next) => {
   // let results = await connection.query('SELECT * FROM stocks');
   // let data = results[0];
-
+  console.log('這裡是 /api/stocks');
   let [data] = await pool.query('SELECT * FROM stocks');
   res.json(data);
 });
