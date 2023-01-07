@@ -1,11 +1,15 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const StockDetails = () => {
   const [error, setError] = useState(null);
   const { stockId } = useParams();
-  const [page, setPage] = useState(1); // 目前在哪一頁
+
+  // 為了處理網址
+  let navigate = useNavigate();
+  const { currentPage } = useParams();
+  const [page, setPage] = useState(parseInt(currentPage, 10) || 1); // 目前在哪一頁
   const [totalPage, setTotalPage] = useState(0); // 總共有幾頁
 
   const [data, setData] = useState([]);
@@ -44,6 +48,8 @@ const StockDetails = () => {
           key={i}
           onClick={(e) => {
             setPage(i);
+            // 處理網址
+            navigate(`/stock/${stockId}/${i}`);
           }}
         >
           {i}
