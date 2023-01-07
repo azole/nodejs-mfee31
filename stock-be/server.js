@@ -82,10 +82,46 @@ app.get('/api/stocks', async (req, res, next) => {
 // SELECT * FROM stock_prices WHERE stock_id=1234 or 1=1;--
 app.get('/api/stocks/:stockId', async (req, res, next) => {
   console.log('/api/stocks/:stockId => ', req.params.stockId);
+
+  // 分頁
+
+  // 從前端拿到目前是要第幾頁
+  // 通常會放在 query string -> req.query.page
+  // /api/stocks/:stockId?page=2
+  // /api/stocks/:stockId -> 如果 page 沒有寫，預設使用者是要第一頁
+  // 如果沒有 page 這個 query string 就預設為 1
+  const page = req.query.page || 1;
+
+  // 總筆數？
+  let [results] = await pool.execute('SELECT COUNT(*) AS total FROM stock_prices WHERE stock_id=?', [req.params.stockId]);
+  // console.log('GET /stocks/details -> count:', results[0].total);
+  const total = results[0].total;
+
+  // 總共有幾頁
+  const perPage = 5; // 一頁有五筆
+  const totalPage = Math.ceil(total / perPage);
+
+  // 計算 offset, limit (一頁有幾筆)
+  const limit = perPage;
+  const offset = perPage * (page - 1);
+
+  // 根據 offset, limit 去取得資料
+  let [data] = await pool.execute('SELECT * FROM stock_prices WHERE stock_id=? ORDER BY date LIMIT ? OFFSET ?', [req.params.stockId, limit, offset]);
+  // 把資料回覆給前端
+  res.json({
+    pagination: {
+      total,
+      perPage,
+      totalPage,
+      page,
+    },
+    data,
+  });
+
   // 會用 prepared statement 的方式來避免發生 sql injection
   // pool.query vs pool.execute
-  let [data] = await pool.execute('SELECT * FROM stock_prices WHERE stock_id=?', [req.params.stockId]);
-  res.json(data);
+  // let [data] = await pool.execute('SELECT * FROM stock_prices WHERE stock_id=?', [req.params.stockId]);
+  // res.json(data);
 });
 
 app.post('/api/stocks', async (req, res) => {
