@@ -1,6 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
+const pool = require('../utils/db');
+
+const argon2 = require('argon2');
 
 // app.use((req, res, next) => {...})
 
@@ -25,8 +28,10 @@ const registerRules = [
 ];
 
 // /api/auth
-router.post('/register', registerRules, (req, res, next) => {
+router.post('/register', registerRules, async (req, res, next) => {
   console.log('I am register', req.body);
+
+  // TODO: async/await 應該要有 try-catch 去做錯誤處理
 
   // 處理驗證的結果
   const validateResult = validationResult(req);
@@ -37,16 +42,33 @@ router.post('/register', registerRules, (req, res, next) => {
     // early return
   }
 
-  // TODO: 檢查 email 是否已經註冊過
+  // 檢查 email 是否已經註冊過
+  let [members] = await pool.execute('SELECT * FROM members WHERE email = ?', [req.body.email]);
+  if (members.length > 0) {
+    // 表示這個 email 有存在資料庫中
+    // 如果已經註冊過，就回覆 400
+    return res.status(400).json({
+      errors: [
+        {
+          msg: 'email 已經註冊過',
+          param: 'email',
+        },
+      ],
+    });
+  }
 
-  // TODO: 如果已經註冊過，就回覆 400
+  // 雜湊 hash 密碼
+  const hashedPassword = await argon2.hash(req.body.password);
 
-  // TODO: 雜湊 hash 密碼
+  // 存到資料庫
+  let result = await pool.execute('INSERT INTO members (email, password, name) VALUES (?, ?, ?);', [req.body.email, hashedPassword, req.body.name]);
+  console.log('register: insert to db', result);
 
-  // TODO: 存到資料庫
-
-  // TODO: 回覆給前端
-  res.json({});
+  // 回覆給前端
+  res.json({
+    email: req.body.email,
+    member_id: result[0].insertId,
+  });
 });
 
 module.exports = router;
