@@ -73,7 +73,7 @@ const registerRules = [
     .withMessage('驗證密碼不符合'),
 ];
 
-// /api/auth
+// /api/auth/register
 router.post('/register', uploader.single('photo'), registerRules, async (req, res, next) => {
   console.log('I am register', req.body, req.file);
 
@@ -119,6 +119,64 @@ router.post('/register', uploader.single('photo'), registerRules, async (req, re
   res.json({
     email: req.body.email,
     member_id: result[0].insertId,
+  });
+});
+
+// /api/auth/login
+router.post('/login', async (req, res, next) => {
+  // 資料驗證？？
+  // 確認 email 是否存在
+  let [members] = await pool.execute('SELECT * FROM members WHERE email = ?', [req.body.email]);
+  if (members.length === 0) {
+    // 表示這個 email 不存在資料庫中 -> 沒註冊過
+    // 不存在，就回覆 401
+    return res.status(401).json({
+      errors: [
+        {
+          // msg: 'email 尚未註冊',
+          // param: 'email',
+          msg: '帳號或密碼錯誤',
+        },
+      ],
+    });
+  }
+
+  // 只是從陣列中拿出資料而已
+  let member = members[0];
+
+  // 如果存在，比對密碼
+  let result = await argon2.verify(member.password, req.body.password);
+  if (result === false) {
+    // 密碼比對失敗
+    // 密碼錯誤，回覆前端 401
+    return res.status(401).json({
+      errors: [
+        {
+          // msg: '密碼錯誤',
+          // param: 'password',
+          msg: '帳號或密碼錯誤',
+        },
+      ],
+    });
+  }
+
+  // 能執行到這裡，表示帳號存在，且密碼正確
+
+  // TODO: 寫入 session
+  // 準備好要寫進 session 的內容
+  let retMember = {
+    id: member.id,
+    name: member.name,
+    email: member.email,
+    photo: member.photo,
+  };
+  // 寫入 session
+  req.session.member = retMember;
+
+  // TODO: 回覆前端
+  res.json({
+    msg: 'ok',
+    member: retMember,
   });
 });
 

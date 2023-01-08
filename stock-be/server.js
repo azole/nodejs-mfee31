@@ -5,16 +5,42 @@ const app = express();
 require('dotenv').config();
 const pool = require('./utils/db');
 
+// 允許跨源存取
+// 預設是全部開放
+// 也可以做部分限制，參考 npm cors 的文件
+const cors = require('cors');
+app.use(
+  cors({
+    // 為了讓 browser 在 CORS 的情況下還是幫我們送 cookie
+    // 必須把 credentails 設定成 true
+    // 但是，當你把 credentials 設定成 true，就一定要設定 origin (來源)
+    origin: ['http://localhost:3000'],
+    credentials: true,
+  })
+);
+
 // 如果要讓 express 認得 json 資料
 // request Content-Type: application/json
 // 需要加上這個中間件
 app.use(express.json());
 
-// 允許跨源存取
-// 預設是全部開放
-// 也可以做部分限制，參考 npm cors 的文件
-const cors = require('cors');
-app.use(cors());
+const expressSession = require('express-session');
+const FileStore = require('session-file-store')(expressSession);
+const path = require('path');
+app.use(
+  expressSession({
+    // 告訴 express-session session 要存哪裡
+    store: new FileStore({
+      path: path.join(__dirname, '..', 'sessions'),
+    }),
+    secret: process.env.SESSION_SECRET,
+    // true: 即使 session 沒有改變也重新儲存一次
+    // 取決於你用的 storage 是有時效性的，可能需要不停地刷新這個時效
+    resave: false,
+    // true: 還沒有正式初始化的 session 也真的存起來
+    saveUninitialized: false,
+  })
+);
 
 // middleware => pipeline pattern
 
@@ -80,7 +106,7 @@ app.get('/test', (req, res, next) => {
 // 利用了中間件會依照程式碼順序來執行的特性
 app.use((req, res, next) => {
   console.log('這裡是 404');
-  res.send('沒有這個網頁啦');
+  res.status(404).send('沒有這個網頁啦');
 });
 
 app.listen(3001, () => {
