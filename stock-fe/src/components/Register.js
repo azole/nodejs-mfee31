@@ -7,6 +7,7 @@ const Register = () => {
     name: 'ashley',
     password: 'test1234',
     confirmPassword: 'test1234',
+    photo: '',
   });
 
   // email input 的 change
@@ -22,12 +23,27 @@ const Register = () => {
     // setMember({ ...member, [e.target.name]: e.target.value });
   }
 
+  function handleUpload(e) {
+    // file input 的值並不是存在 value 欄位裡
+    setMember({ ...member, photo: e.target.files[0] });
+  }
+
   async function handleSubmit(e) {
     console.log('handleSubmit');
     // 關閉表單的預設行為
     e.preventDefault();
+    // 作法1: 沒有檔案的表單
     // ajax
-    let response = await axios.post('http://localhost:3001/api/auth/register', member);
+    // let response = await axios.post('http://localhost:3001/api/auth/register', member);
+    // 作法2: 有檔案的表單
+    // https://developer.mozilla.org/en-US/docs/Web/API/FormData
+    let formData = new FormData();
+    formData.append('email', member.email);
+    formData.append('name', member.name);
+    formData.append('password', member.password);
+    formData.append('confirmPassword', member.confirmPassword);
+    formData.append('photo', member.photo);
+    let response = await axios.post('http://localhost:3001/api/auth/register', formData);
     console.log(response.data);
   }
 
@@ -90,7 +106,13 @@ const Register = () => {
         <label htmlFor="photo" className="flex mb-2 w-32">
           圖片
         </label>
-        <input className="w-full border-2 border-purple-200 rounded-md h-10 focus:outline-none focus:border-purple-400 px-2" type="file" id="photo" name="photo" />
+        <input
+          className="w-full border-2 border-purple-200 rounded-md h-10 focus:outline-none focus:border-purple-400 px-2"
+          type="file"
+          id="photo"
+          name="photo"
+          onChange={handleUpload}
+        />
       </div>
       <button className="text-xl bg-indigo-300 px-4 py-2.5 rounded hover:bg-indigo-400 transition duration-200 ease-in" onClick={handleSubmit}>
         註冊

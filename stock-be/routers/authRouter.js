@@ -42,6 +42,7 @@ router.post('/register', registerRules, async (req, res, next) => {
     // early return
   }
 
+  // 驗證通過
   // 檢查 email 是否已經註冊過
   let [members] = await pool.execute('SELECT * FROM members WHERE email = ?', [req.body.email]);
   if (members.length > 0) {
@@ -56,6 +57,8 @@ router.post('/register', registerRules, async (req, res, next) => {
       ],
     });
   }
+
+  // --> 這個 email 不存在於資料庫中
 
   // 雜湊 hash 密碼
   const hashedPassword = await argon2.hash(req.body.password);
