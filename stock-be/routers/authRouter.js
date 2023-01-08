@@ -12,6 +12,52 @@ router.use((req, res, next) => {
   next();
 });
 
+// 要處理 content-type 是 multipart/form-data
+// express 沒有內建，需要另外用套件
+// 這邊用第三方套件 multer 來處理
+const multer = require('multer');
+const path = require('path');
+// 設定圖片存哪裡: 位置跟名稱
+const storage = multer.diskStorage({
+  // 設定儲存的目的地 -> 檔案夾
+  // 先手動建立好檔案夾 public/uploads
+  destination: function (req, file, cb) {
+    // path.join: 避免不同的作業系統之間 / 或 \
+    // __dirname 目前檔案所在的目錄路徑
+    cb(null, path.join(__dirname, '..', 'public', 'uploads'));
+  },
+  // 圖片名稱
+  filename: function (req, file, cb) {
+    console.log('multer storage', file);
+    // {
+    //   fieldname: 'photo',
+    //   originalname: 'AI-replace.jpg',
+    //   encoding: '7bit',
+    //   mimetype: 'image/jpeg'
+    // }
+    const ext = file.originalname.split('.').pop();
+    cb(null, `${Date.now()}.${ext}`);
+    // uuid https://www.npmjs.com/package/uuid
+  },
+});
+// 真正在處理上傳
+const uploader = multer({
+  storage: storage,
+  // 圖片格式的 validation
+  fileFilter: function (req, file, cb) {
+    if (file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/jpg' && file.mimetype !== 'image/png') {
+      cb(new Error('上傳圖片格式不合法'), false);
+    } else {
+      cb(null, true);
+    }
+  },
+  // 限制檔案的大小
+  limits: {
+    // 1k = 1024 => 200k 200x1024
+    fileSize: 200 * 1024, // 204800
+  },
+});
+
 // 驗證資料 validation -> 因為後端不可以相信來自前端的資料
 const registerRules = [
   // 中間件: 負責檢查 email 是否合法
@@ -28,7 +74,7 @@ const registerRules = [
 ];
 
 // /api/auth
-router.post('/register', registerRules, async (req, res, next) => {
+router.post('/register', uploader.single('photo'), registerRules, async (req, res, next) => {
   console.log('I am register', req.body);
 
   // TODO: async/await 應該要有 try-catch 去做錯誤處理
