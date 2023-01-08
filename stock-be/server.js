@@ -25,6 +25,10 @@ app.use(cors());
 // localhost:3001/2048/
 app.use('/2048', express.static('./static'));
 
+// 處理使用者註冊時上傳的圖片網址
+// http://localhost:3001/public/uploads/1673160926241.jpg
+app.use('/public', express.static('./public'));
+
 // 中間件
 app.use((req, res, next) => {
   console.log('這裡是的一個中間件 A');

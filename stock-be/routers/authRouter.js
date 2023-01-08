@@ -75,7 +75,7 @@ const registerRules = [
 
 // /api/auth
 router.post('/register', uploader.single('photo'), registerRules, async (req, res, next) => {
-  console.log('I am register', req.body);
+  console.log('I am register', req.body, req.file);
 
   // TODO: async/await 應該要有 try-catch 去做錯誤處理
 
@@ -110,7 +110,9 @@ router.post('/register', uploader.single('photo'), registerRules, async (req, re
   const hashedPassword = await argon2.hash(req.body.password);
 
   // 存到資料庫
-  let result = await pool.execute('INSERT INTO members (email, password, name) VALUES (?, ?, ?);', [req.body.email, hashedPassword, req.body.name]);
+  // 允許使用者不上傳圖片，所以要先檢查一下使用者到底有沒有上傳
+  const filename = req.file ? path.join('uploads', req.file.filename) : '';
+  let result = await pool.execute('INSERT INTO members (email, password, name, photo) VALUES (?, ?, ?, ?);', [req.body.email, hashedPassword, req.body.name, filename]);
   console.log('register: insert to db', result);
 
   // 回覆給前端
