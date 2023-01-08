@@ -6,11 +6,23 @@ const router = express.Router();
 
 const pool = require('../utils/db');
 
+router.use((req, res, next) => {
+  console.log('這裡是 stock router 的中間件');
+  next();
+});
+
 // app.use => router.use
 // app.get => router.get
 // app.post => router.post
 
-router.get('/', async (req, res, next) => {
+function singleMiddleware(req, res, next) {
+  console.log('我是 single 中間件');
+  next();
+}
+
+const middlewares = [singleMiddleware, singleMiddleware, singleMiddleware, singleMiddleware];
+// /api/stocks
+router.get('/', middlewares, async (req, res, next) => {
   // let results = await connection.query('SELECT * FROM stocks');
   // let data = results[0];
   console.log('這裡是 /api/stocks');
